@@ -1,0 +1,120 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  password String
+  isArtist Boolean @default(false)
+
+  portfolios   Portfolio[]
+  bookings     Booking[]   @relation("UserBookings")
+  appointments Booking[]   @relation("ArtistBookings")
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  TattooArtist TattooArtist?
+  Notification Notification[]
+  chatsAsUser1 Chat[]         @relation("ChatUser1")
+  chatsAsUser2 Chat[]         @relation("ChatUser2")
+
+  // Messages
+  messages Message[]
+}
+
+model TattooArtist {
+  id         String      @id @default(cuid())
+  userId     String      @unique
+  bio        String?
+  portfolios Portfolio[]
+  user       User        @relation(fields: [userId], references: [id])
+}
+
+model Portfolio {
+  id    String  @id @default(uuid())
+  title String
+  bio   String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  TattooArtist   TattooArtist? @relation(fields: [tattooArtistId], references: [id])
+  tattooArtistId String?
+}
+
+model Booking {
+  id   String   @id @default(uuid())
+  date DateTime
+
+  status BookingStatus @default(PENDING)
+
+  userId   String
+  artistId String
+
+  user   User @relation("UserBookings", fields: [userId], references: [id])
+  artist User @relation("ArtistBookings", fields: [artistId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model Notification {
+  id      String  @id @default(uuid())
+  message String
+  read    Boolean @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Chat {
+  id      String @id @default(uuid())
+  user1Id String
+  user2Id String
+
+  user1 User @relation("ChatUser1", fields: [user1Id], references: [id])
+  user2 User @relation("ChatUser2", fields: [user2Id], references: [id])
+
+  messages Message[]
+
+  // New fields for inbox functionality
+  lastMessage   Message? @relation("LastMessage", fields: [lastMessageId], references: [id])
+  lastMessageId String?
+
+  unreadCount Int @default(0)
+
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id       String @id @default(uuid())
+  chatId   String
+  senderId String
+  text     String
+
+  chat   Chat @relation(fields: [chatId], references: [id])
+  sender User @relation(fields: [senderId], references: [id])
+
+  // This is the reverse relation for Chat.lastMessage
+  chatsAsLastMessage Chat[] @relation("LastMessage")
+
+  createdAt DateTime @default(now())
+}
