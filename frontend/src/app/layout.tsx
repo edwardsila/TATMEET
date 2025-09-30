@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,12 +24,40 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
-  );
+        <html lang="en">
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            <nav className="bg-black text-white px-8 py-4 flex items-center shadow-md">
+              {/* Logo on the left */}
+              <Link href="/" className="flex items-center mr-8">
+                <img src="/next.svg" alt="TATM33T Logo" className="w-10 h-10 mr-2" />
+                <span className="text-2xl font-extrabold tracking-widest text-red-500">TATM33T</span>
+              </Link>
+              {/* Centered navigation links */}
+              <div className="flex gap-6 flex-1 justify-center">
+                <Link href="/" className="transition transform hover:scale-110 hover:text-red-400">Home</Link>
+                <Link href="/artist" className="transition transform hover:scale-110 hover:text-red-400">Artists</Link>
+                <Link href="/dashboard" className="transition transform hover:scale-110 hover:text-red-400">Dashboard</Link>
+                <Link href="/booking" className="transition transform hover:scale-110 hover:text-red-400">Booking</Link>
+                <Link href="/chat" className="transition transform hover:scale-110 hover:text-red-400">Chat</Link>
+              </div>
+              {/* Login/Register on the right */}
+              <div className="flex gap-4 ml-8">
+                <Link href="/login" className="transition transform hover:scale-110 hover:text-red-400">Login</Link>
+                <Link href="/register" className="transition transform hover:scale-110 hover:text-red-400">Register</Link>
+              </div>
+            </nav>
+            {children}
+            <footer className="bg-black text-gray-400 py-6 px-8 mt-12 flex flex-col items-center justify-center">
+              <div className="mb-2 text-sm">&copy; {new Date().getFullYear()} Tatmeet. All rights reserved.</div>
+              <div className="flex gap-4">
+                <a href="/artist" className="hover:text-red-400 transition">Artists</a>
+                <a href="/booking" className="hover:text-red-400 transition">Book a Session</a>
+                <a href="/chat" className="hover:text-red-400 transition">Chat</a>
+              </div>
+            </footer>
+          </body>
+        </html>
+      );
 }
