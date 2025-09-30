@@ -8,6 +8,7 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<string>("");
   const [errors, setErrors] = useState<string[]>([]);
   const [success, setSuccess] = useState<string>("");
   const router = useRouter();
@@ -19,17 +20,18 @@ export default function Register() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const newErrors = [];
-    if (!name.trim()) newErrors.push("Name is required.");
-    if (!email.trim()) newErrors.push("Email is required.");
-    else if (!validateEmail(email)) newErrors.push("Email is invalid.");
-    if (!password) newErrors.push("Password is required.");
-    if (!confirmPassword) newErrors.push("Confirm password is required.");
-    if (password && confirmPassword && password !== confirmPassword) newErrors.push("Passwords do not match.");
+  if (!name.trim()) newErrors.push("Name is required.");
+  if (!email.trim()) newErrors.push("Email is required.");
+  else if (!validateEmail(email)) newErrors.push("Email is invalid.");
+  if (!password) newErrors.push("Password is required.");
+  if (!confirmPassword) newErrors.push("Confirm password is required.");
+  if (password && confirmPassword && password !== confirmPassword) newErrors.push("Passwords do not match.");
+  if (!role) newErrors.push("Please select your role.");
     setErrors(newErrors);
     setSuccess("");
     if (newErrors.length === 0) {
       try {
-        await axios.post("/api/register", { name, email, password });
+        await axios.post("/api/users/register", { name, email, password, role });
         setSuccess("Registration successful! Redirecting to login...");
         setTimeout(() => router.push("/login"), 1500);
       } catch (err: any) {
@@ -72,6 +74,17 @@ export default function Register() {
             value={confirmPassword}
             onChange={e => setConfirmPassword(e.target.value)}
           />
+          <select
+            className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 appearance-none"
+            value={role}
+            onChange={e => setRole(e.target.value)}
+          >
+            <option value="" disabled>
+              Select your role
+            </option>
+            <option value="client">Client</option>
+            <option value="artist">Tattoo Artist</option>
+          </select>
           <button type="submit" className="w-full py-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-lg transition">Register</button>
         </form>
         {/* Toast notifications for errors and success */}

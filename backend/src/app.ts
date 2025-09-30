@@ -11,10 +11,9 @@ dotenv.config();
 const app = express();
 
 // Middleware
-
-app.use("/api/users", userRoutes);
 app.use(cors());
 app.use(express.json());
+app.use("/api/users", userRoutes);
 app.use("/api/portfolios", portfolioRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/notifications", notificationRoutes);

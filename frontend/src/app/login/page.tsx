@@ -26,8 +26,15 @@ export default function Login() {
       try {
         const res = await axios.post("/api/login", { email, password });
         localStorage.setItem("tatm33t_token", res.data.token);
+        localStorage.setItem("tatm33t_role", res.data.user.isArtist ? "artist" : "client");
         setSuccess("Login successful! Redirecting...");
-        setTimeout(() => router.push("/dashboard"), 1500);
+        setTimeout(() => {
+          if (res.data.user.isArtist) {
+            router.push("/home/artist");
+          } else {
+            router.push("/home/client");
+          }
+        }, 1500);
       } catch (err: any) {
         setErrors([err?.response?.data?.message || "Login failed"]);
       }
