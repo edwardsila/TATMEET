@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 export default function ArtistHome() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalImage, setModalImage] = useState<string | null>(null);
   const [portfolio, setPortfolio] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -66,13 +68,30 @@ export default function ArtistHome() {
             <input
               type="text"
               placeholder="Title"
+              value={modalTitle}
+              onChange={e => setModalTitle(e.target.value)}
               className="w-full mb-4 px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none"
             />
             <input
-              type="text"
-              placeholder="Image URL"
+              type="file"
+              accept="image/*"
               className="w-full mb-4 px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none"
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setModalImage(reader.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                } else {
+                  setModalImage(null);
+                }
+              }}
             />
+            {modalImage && (
+              <img src={modalImage} alt="Preview" className="w-full h-40 object-cover rounded-lg mb-4 border border-gray-700" />
+            )}
             <div className="flex gap-4 mt-4">
               <button className="px-4 py-2 rounded-lg bg-green-500 text-white font-bold" onClick={() => setShowModal(false)}>Save</button>
               <button className="px-4 py-2 rounded-lg bg-gray-700 text-white font-bold" onClick={() => setShowModal(false)}>Cancel</button>
