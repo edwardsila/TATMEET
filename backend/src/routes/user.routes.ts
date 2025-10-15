@@ -37,6 +37,7 @@ router.post("/register", async (req, res) => {
 
 // Login route
 router.post("/login", async (req, res) => {
+  console.log('Login request body:', req.body);
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password required" });
@@ -44,22 +45,26 @@ router.post("/login", async (req, res) => {
   try {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      console.log('Login error: User not found for email', email);
+      return res.status(400).json({ message: "Invalid email or password" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      console.log('Login error: Password mismatch for email', email);
+      return res.status(400).json({ message: "Invalid email or password" });
     }
     if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET not defined in .env");
+      console.error('Login error: JWT_SECRET not defined in .env');
+      return res.status(500).json({ message: "JWT_SECRET not defined in .env" });
     }
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    console.log('Login successful for user:', user.email);
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, isArtist: user.isArtist } });
   } catch (err) {
+    console.error('Login error:', err);
     res.status(500).json({ message: "Login failed", error: err });
   }
 });
-
 router.get("/profile", protect, async (req, res) => {
   try {
     const userId = (req as any).userId;
