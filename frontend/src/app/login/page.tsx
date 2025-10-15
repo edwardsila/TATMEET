@@ -24,7 +24,7 @@ export default function Login() {
     setSuccess("");
     if (newErrors.length === 0) {
       try {
-        const res = await axios.post("/api/login", { email, password });
+        const res = await axios.post("/api/users/login", { email, password });
         localStorage.setItem("tatm33t_token", res.data.token);
         localStorage.setItem("tatm33t_role", res.data.user.isArtist ? "artist" : "client");
         setSuccess("Login successful! Redirecting...");
